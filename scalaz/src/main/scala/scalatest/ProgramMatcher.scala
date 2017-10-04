@@ -1,4 +1,5 @@
 package org.hablapps.puretest
+package scalatestImpl
 
 import org.scalatest._, matchers._, Matchers._
 
@@ -37,13 +38,7 @@ object ProgramMatchers{
       def runWithoutErrors = new Matcher[P[_]]{
         def apply(program: P[_]) =
           test(program).fold(
-            error => {
-              val msg = error match { // TODO: This is ugly
-                case e: Throwable => s"Unexpected exception $e\n" + e.getStackTrace.mkString("\n")
-                case e => s"Unexpected exception $e"
-              }
-              MatchResult(false, msg, "should not happen")
-            },
+            error => MatchResult(false, error.toString, "should not happen"),
             result => MatchResult(true, "should not happen", s"Program ran w/o errors: $result"))
       }
     }

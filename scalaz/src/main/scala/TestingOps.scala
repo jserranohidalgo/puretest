@@ -25,25 +25,32 @@ trait TestingOps{
     def isEqual(a: A)(implicit F: Functor[P]): P[Boolean] =
       F.map(self)(_ == a)
 
-    case class NotError[A](value: A, e: Throwable) extends RuntimeException
-    case class OtherError(error: Throwable, e: Throwable) extends RuntimeException{
-      override def toString() = s"OtherError($error,$e)"
+    case class NotError[A](value: A, e: Throwable)(location: Location) extends RuntimeException{
+      override def toString() = s"$value was not equal to error $e ${simplifyLocation(location)}"
     }
 
-    def assertError(e: Throwable)(implicit ME: MonadError[P, Throwable]): P[Unit] =
+    case class OtherError(error: Throwable, e: Throwable)(location: Location) extends RuntimeException{
+      override def toString() = s"Error $error was not equal to error $e ${simplifyLocation(location)}"
+    }
+
+    def shouldFail(e: Throwable)(implicit ME: MonadError[P, Throwable],
+        F: sourcecode.File, L: sourcecode.Line): P[Unit] =
       (self >>= { a =>
-        (NotError(a,e): Throwable).raiseError[P,Unit]
+        (NotError(a,e)((F,L)): Throwable).raiseError[P,Unit]
       }).handleError{
         case `e` => ().point[P]
         case error =>
-        (OtherError(error,e): Throwable).raiseError[P,Unit]
+        (OtherError(error,e)((F,L)): Throwable).raiseError[P,Unit]
       }
 
-    case class NotEqualTo[A](a1: A, a2: A) extends RuntimeException
+    case class NotEqualTo[A](a1: A, a2: A)(location: Location) extends RuntimeException{
+      override def toString() = s"$a2 was not equal to $a1 ${simplifyLocation(location)}"
+    }
 
-    def assertEqual(a1: A)(implicit ME: MonadError[P, Throwable]): P[Unit] =
+    def shouldBe(a1: A)(implicit ME: MonadError[P, Throwable],
+        F: sourcecode.File, L: sourcecode.Line): P[Unit] =
       self >>= { a2 =>
-        if (a1 == a2) ().point[P] else ME.raiseError(NotEqualTo(a1, a2))
+        if (a1 == a2) ().point[P] else ME.raiseError(NotEqualTo(a1, a2)((F,L)))
       }
   }
 }
