@@ -1,11 +1,9 @@
 package org.hablapps.puretest
 
-trait FunSpec{
+trait FunSpec[P[_]]{
 
   def Describe(subject: String)(test: => Unit): Unit
 
-  def It[P[_],A](condition: String)(
-    program: => P[A])(implicit
-    tester: Tester[P,Throwable]): Unit
+  def It[A](condition: String)(program: => P[A]): Unit
 }
 
