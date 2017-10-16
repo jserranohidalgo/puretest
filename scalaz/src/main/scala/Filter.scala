@@ -11,7 +11,7 @@ object Filter{
   def apply[F[_]](implicit S: Filter[F]) = S
 
   // Use in for-comprehensions
-  trait Syntax{
+  trait Syntax {
 
     implicit class FilterOps[F[_],A](fa: F[A])(implicit SF: Filter[F]){
       def filter(f: A => Boolean)(implicit F: sourcecode.File, L: sourcecode.Line): F[A] =
@@ -21,7 +21,7 @@ object Filter{
     }
   }
 
-  object Syntax extends Syntax
+  object syntax extends Syntax
 
   import scalaz.MonadError, scalaz.syntax.monadError._
 
@@ -31,22 +31,35 @@ object Filter{
     override def getMessage = toString
   }
 
-  def FilterForMonadError[F[_],E](implicit
-    error: (String, Location) => E,
-    merror: MonadError[F,E]) =
-    new Filter[F]{
+  def FilterForMonadError[F[_], E](error: (String, Location) => E)(implicit
+      merror: MonadError[F, E]) =
+    new Filter[F] {
       def filter[A](fa: F[A])(f: A => Boolean)(implicit
         F: sourcecode.File, L: sourcecode.Line): F[A] =
         merror.bind(fa)(a =>
-          if (f(a)) a.point[F] else merror.raiseError(error(a.toString,(F,L)))
+          if (f(a)) a.point[F] else merror.raiseError(error(a.toString, (F, L)))
         )
     }
 
   implicit def FilterForLocation[F[_]](
-    implicit merror: MonadError[F,Location]) =
-    FilterForMonadError((_,loc) => loc,merror)
+      implicit merror: MonadError[F, Location]) =
+    FilterForMonadError[F, Location]((_, loc) => loc)
 
   implicit def FilterForThrowable[F[_]](
-    implicit merror: MonadError[F,Throwable]) =
-    FilterForMonadError(LocationException(_,_), merror)
+      implicit merror: MonadError[F, Throwable]) =
+    FilterForMonadError[F, Throwable](LocationException(_, _))
+
+  // POC(jfuentes)
+  implicit def FilterForTester[F[_], E](implicit
+      T: Tester[F, E],
+      ME: MonadError[F, Either[LocationException, E]]) =
+    new Filter[F] {
+      def filter[A](fa: F[A])(f: A => Boolean)(implicit
+          F: sourcecode.File, L: sourcecode.Line): F[A] =
+        fa >>= { a =>
+          if (f(a)) a.point[F]
+          else ME.raiseError(Left(LocationException(a.toString, (F, L))))
+        }
+    }
+
 }

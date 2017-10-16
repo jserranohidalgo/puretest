@@ -5,16 +5,21 @@ import scalaz.{\/, ~>}
 /**
  * Testers
  */
-trait Tester[P[_],E] extends (P~> (E \/ ?))
+trait Tester[P[_], E] extends (P ~> Either[E, ?])
 
-object Tester{
-  def apply[P[_],E](implicit T: Tester[P,E]) = T
+object Tester {
+  def apply[P[_], E](implicit T: Tester[P, E]) = T
 
   /* Testing either programs */
 
-  implicit def eitherTester[E]: Tester[E \/ ?, E] =
-    new Tester[E \/ ?,E]{
-      def apply[X](e: E \/ X) = e
+  implicit def disjunctionTester[E] =
+    new Tester[E \/ ?, E] {
+      def apply[X](e: E \/ X) = e.toEither
+    }
+
+  implicit def eitherTester[E] =
+    new Tester[Either[E, ?], E] {
+      def apply[X](e: Either[E, X]) = e
     }
 
   /* Testing asynch programs */
@@ -23,12 +28,12 @@ object Tester{
   import scala.util.Try, scalaz.syntax.std.`try`._
   import scala.util.{Success, Failure}
 
-  implicit def futureTester: Tester[Future, Throwable] =
-    new Tester[Future,Throwable]{
+  implicit def futureTester =
+    new Tester[Future, Throwable] {
       def apply[X](f: Future[X]) =
-        (Try(Await.result(f, 60 second)) match {
-          case s@Success(_) => s
-          case f@Failure(t) => t.printStackTrace ; f
-        }).toDisjunction
+        Try(Await.result(f, 60 second)) match {
+          case Success(s) => Right(s)
+          case Failure(t) => Left(t)
+        }
     }
 }

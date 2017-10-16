@@ -7,7 +7,7 @@ package object puretest
   with StateValidationMonad
   with TestingOps{
 
-  type Location = (_root_.sourcecode.File,_root_.sourcecode.Line)
+  type Location = (sourcecode.File, sourcecode.Line)
 
   def simplifyLocation(location: Location): String = {
     val fileext = raw".*/(.*)".r

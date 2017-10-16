@@ -1,14 +1,11 @@
 package org.hablapps.puretest
 package test
 
-trait Spec[P[_]]{
+import scalaz.syntax.monad._
 
-  val MS: scalaz.MonadState[P,Int]
-  implicit val ME: scalaz.MonadError[P,Throwable]
+trait Spec[P[_]] extends SimpleSpec[P, Throwable] {
 
-  implicit val Fi: Filter[P]
-
-  import scalaz.syntax.monad._, Filter.Syntax._
+  val MS: scalaz.MonadState[P, Int]
 
   /* Working programs */
 
@@ -49,6 +46,6 @@ trait Spec[P[_]]{
 
   def failingProgramWithHandledError: P[Unit] =
     for {
-      Left(Error1(1)) <- ME.raiseError[Unit](Error1(1)).error
+      Left(Error1(1)) <- ME.raiseError[Unit](Error1(1)).inspect
     } yield ()
 }
