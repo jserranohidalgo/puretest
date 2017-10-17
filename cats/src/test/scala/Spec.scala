@@ -49,6 +49,6 @@ trait Spec[P[_]]{
 
   def failingProgramWithHandledError: P[Unit] =
     for {
-      Left(Error1(1)) <- ME.raiseError[Unit](Error1(1)).error
+      Left(Error1(1)) <- ME.raiseError[Unit](Error1(1)).inspect
     } yield ()
 }

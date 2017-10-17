@@ -11,7 +11,7 @@ trait SpecScalatest[P[_]] extends Spec[P]{ self : FunSpec with Matchers =>
 
   // Tests
 
-  import ProgramStateMatchers.Syntax._
+  import scalatestImpl.ProgramStateMatchers.Syntax._
 
   describe("beSatisfied for Boolean program"){
 

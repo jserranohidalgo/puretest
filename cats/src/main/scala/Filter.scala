@@ -26,8 +26,6 @@ object Filter{
 
   object Syntax extends Syntax
 
-  type Location = (sourcecode.File, sourcecode.Line)
-
   case class LocationException(obtained: String, location: Location) extends Throwable {
     override def toString =
       s"returned value $obtained does not match pattern at ${location.toString}"

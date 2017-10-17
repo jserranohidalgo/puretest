@@ -1,14 +1,14 @@
 package org.hablapps.puretest
 
+import scalaz.{Functor, MonadError}
+import scalaz.syntax.monadError._
+
 /**
  * Utilities for test specifications
  */
-trait TestingOps{
+trait TestingOps {
 
-  implicit class TestingOps[P[_], A](self: P[A]){
-
-    import scalaz.MonadError
-    import scalaz.syntax.monadError._
+  implicit class TestingOps[P[_], A](self: P[A]) {
 
     def isError[E: MonadError[P,?]](e: E): P[Boolean] =
       (self as false).handleError{
@@ -20,18 +20,8 @@ trait TestingOps{
         _.point[P] map Left.apply[E,A]
       }
 
-    import scalaz.Functor
-
     def isEqual(a: A)(implicit F: Functor[P]): P[Boolean] =
       F.map(self)(_ == a)
-
-    case class NotError[A](value: A, e: Throwable)(location: Location) extends RuntimeException{
-      override def toString() = s"$value was not equal to error $e ${simplifyLocation(location)}"
-    }
-
-    case class OtherError(error: Throwable, e: Throwable)(location: Location) extends RuntimeException{
-      override def toString() = s"Error $error was not equal to error $e ${simplifyLocation(location)}"
-    }
 
     def shouldFail(e: Throwable)(implicit ME: MonadError[P, Throwable],
         F: sourcecode.File, L: sourcecode.Line): P[Unit] =
@@ -42,10 +32,6 @@ trait TestingOps{
         case error =>
         (OtherError(error,e)((F,L)): Throwable).raiseError[P,Unit]
       }
-
-    case class NotEqualTo[A](a1: A, a2: A)(location: Location) extends RuntimeException{
-      override def toString() = s"$a2 was not equal to $a1 ${simplifyLocation(location)}"
-    }
 
     def shouldBe(a1: A)(implicit ME: MonadError[P, Throwable],
         F: sourcecode.File, L: sourcecode.Line): P[Unit] =
