@@ -25,12 +25,11 @@ trait TestingOps {
 
     def shouldFail(e: Throwable)(implicit ME: MonadError[P, Throwable],
         F: sourcecode.File, L: sourcecode.Line): P[Unit] =
-      (self >>= { a =>
-        (NotError(a,e)((F,L)): Throwable).raiseError[P,Unit]
-      }).handleError{
-        case `e` => ().point[P]
-        case error =>
-        (OtherError(error,e)((F,L)): Throwable).raiseError[P,Unit]
+      self.void handleError {
+        case `e` => ().pure[P]
+        case other => ME.raiseError(OtherError(other, e)((F, L)))
+      } >>= { a =>
+        ME.raiseError(NotError(a, e)((F, L)))
       }
 
     def shouldBe(a1: A)(implicit ME: MonadError[P, Throwable],
