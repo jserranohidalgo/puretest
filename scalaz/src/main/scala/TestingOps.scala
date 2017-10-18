@@ -10,21 +10,21 @@ trait TestingOps {
 
   implicit class TestingOps[P[_], A](self: P[A]) {
 
-    // Boolean version
+    // // Boolean version
 
-    def fails[E](implicit ME: MonadError[P, E]): P[Boolean] =
-      (self as false) handleError { _ => true.point[P] }
+    // def fails[E](implicit ME: MonadError[P, E]): P[Boolean] =
+    //   (self as false) handleError { _ => true.point[P] }
 
-    def succeeds[E](implicit ME: MonadError[P, E]): P[Boolean] =
-      (self as true) handleError { _ => false.point[P] }
+    // def succeeds[E](implicit ME: MonadError[P, E]): P[Boolean] =
+    //   (self as true) handleError { _ => false.point[P] }
 
-    def isError[E: MonadError[P, ?]](e: E): P[Boolean] =
-      (self as false).handleError {
-        error: E => (error == e).point[P]
-      }
+    // def isError[E: MonadError[P, ?]](e: E): P[Boolean] =
+    //   (self as false).handleError {
+    //     error: E => (error == e).point[P]
+    //   }
 
-    def isEqual(a: A)(implicit F: Functor[P]): P[Boolean] =
-      self map (_ == a)
+    // def isEqual(a: A)(implicit F: Functor[P]): P[Boolean] =
+    //   self map (_ == a)
 
     def inspect[E: MonadError[P, ?]]: P[Either[E, A]] =
       (self map (Right(_): Either[E, A])) handleError {

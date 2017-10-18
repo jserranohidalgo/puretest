@@ -21,18 +21,18 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
   }
 
   Describe("Place Spec") {
-    Holds("should not be possible to place more than one stone at the same place") {
+    It("should not be possible to place more than one stone at the same place") {
       reset >>
       place(X, (1, 1)) >>
       place(O, (1, 1)).isError[Error](OccupiedPosition((1, 1)))
     }
 
-    Holds("Placing outside of the board is error") {
+    It("Placing outside of the board is error") {
       reset >>
       place(X, (5, 5)).isError[Error](NotInTheBoard((5, 5)))
     }
 
-    Holds("Placing in the wrong turn") {
+    It("Placing in the wrong turn") {
       reset >>
       place(O, (1, 1)).isError[Error](WrongTurn(O))
     }
@@ -45,7 +45,7 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
         currentTurnIs(X))
     }
 
-    Holds("Position must be occupied") {
+    It("Position must be occupied") {
       reset >>
       place(X, (1, 1)) >>
       in((1, 1)) isEqual Option(X)
@@ -79,7 +79,7 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
   }
 
   Describe("Simulation behaviour") {
-    Holds("Unfinished match") {
+    It("Unfinished match") {
       reset >>
       simulate((0, 0), (0, 1))((1, 0), (1, 1)).isError[Error](NotEnoughMoves())
     }
