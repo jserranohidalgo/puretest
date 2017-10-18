@@ -1,7 +1,8 @@
 package org.hablapps.puretest
 
-import cats.MonadError
-import cats.syntax.applicative._
+import cats.{Monad, MonadError}
+import cats.data.StateT
+import cats.syntax.all._
 
 trait Filter[F[_]]{
   def filter[A](fa: F[A])(f: A => Boolean)(implicit
@@ -47,4 +48,22 @@ object Filter{
 
   implicit def FilterForThrowable[F[_]: MonadError[?[_], Throwable]] =
     FilterForMonadError[F, Throwable](LocationException(_, _))
+
+  implicit def FilterEither[E] = new Filter[Either[E, ?]] {
+    def filter[A](fa: Either[E, A])(f: A => Boolean)(implicit F: sourcecode.File, L: sourcecode.Line): Either[E, A] =
+      fa match {
+        case valid @ Right(a) if (f(a)) => valid
+        case l @ Left(_) => l
+        case Right(a) => throw FilterError(a.toString)((F, L))
+      }
+  }
+
+  implicit def FilterStateT[F[_]: Monad: Filter, S, E] = new Filter[StateT[F, S, ?]] {
+    def filter[A](fa: StateT[F, S, A])(f: A => Boolean)(implicit F: sourcecode.File, L: sourcecode.Line): StateT[F, S, A] =
+      StateT[F, S, A] { bs =>
+        val res = fa.run(bs)
+        Filter[F].filter(res.map(_._2))(f).flatMap(x => res.map(y => (y._1, x)))
+      }
+  }
+
 }

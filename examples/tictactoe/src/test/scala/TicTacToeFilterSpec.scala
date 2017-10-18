@@ -4,7 +4,7 @@ package test
 
 import cats.syntax.all._
 
-trait TicTacToeSpec[P[_]] extends FunSpec[P] {
+trait TicTacToeFilterSpec[P[_]] extends FunSpec[P] with FilterSpec[P] {
 
   /* Evidence */
 
@@ -46,9 +46,11 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
     }
 
     It("Position must be occupied") {
-      reset >>
-      place(X, (1, 1)) >>
-      in((1, 1)) isEqual Option(X)
+      for {
+        _ <- reset
+        _ <- place(X, (1, 1))
+        Some(X) <- in((1, 1))
+      } yield true
     }
   }
 

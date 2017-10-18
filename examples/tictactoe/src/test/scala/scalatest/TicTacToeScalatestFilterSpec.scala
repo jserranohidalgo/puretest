@@ -5,10 +5,11 @@ package test
 import scalatestImpl.ScalatestFunSpec
 import cats.instances.either._
 
-class BoardStateSpec extends ScalatestFunSpec[BoardState.Program, TicTacToe.Error]
-    with TicTacToeSpec[BoardState.Program] {
+class BoardStateFilterSpec extends ScalatestFunSpec[BoardState.Program, TicTacToe.Error]
+    with TicTacToeFilterSpec[BoardState.Program] {
 
   val ticTacToe = BoardState.BoardTicTacToe
   val Tester = StateTester[BoardState.Program, BoardState, TicTacToe.Error].apply(BoardState.empty)
+  val Fi = Filter[BoardState.Program]
 
 }
