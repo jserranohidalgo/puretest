@@ -18,5 +18,5 @@ class SpecScalatestStateT extends FunSpec with Matchers with SpecScalatest[Progr
 object SpecScalatestStateT{
   import scalaz.{\/, StateT}
 
-  type Program[T]=StateT[Throwable \/ ?, Int, T]
+  type Program[T] = StateT[Throwable \/ ?, Int, T]
 }

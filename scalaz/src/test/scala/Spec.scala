@@ -1,11 +1,13 @@
 package org.hablapps.puretest
 package test
 
+import scalaz.MonadError
 import scalaz.syntax.monad._
 
-trait Spec[P[_]] extends SimpleSpec[P, Throwable] {
+trait Spec[P[_]] extends FilterSpec[P] {
 
   val MS: scalaz.MonadState[P, Int]
+  implicit val ME: MonadError[P, Throwable]
 
   /* Working programs */
 

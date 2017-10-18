@@ -2,15 +2,12 @@ package org.hablapps.puretest
 package test
 
 import cats.{MonadState, MonadError}
-import cats.implicits._
-import Filter.Syntax._
+import cats.syntax.all._
 
-trait Spec[P[_]]{
+trait Spec[P[_]] extends FilterSpec[P] {
 
   val MS: MonadState[P, Int]
   implicit val ME: MonadError[P, Throwable]
-
-  implicit val Fi: Filter[P]
 
   /* Working programs */
 

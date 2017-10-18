@@ -14,30 +14,30 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
   import ticTacToe._, TicTacToe._
 
   Describe("Reset Spec") {
-    It("First turn X") {
+    Holds("First turn is X") {
       reset >>
       currentTurnIs(X)
     }
   }
 
   Describe("Place Spec") {
-    It("should not be possible to place more than one stone at the same place") {
+    Holds("should not be possible to place more than one stone at the same place") {
       reset >>
       place(X, (1, 1)) >>
       place(O, (1, 1)).isError[Error](OccupiedPosition((1, 1)))
     }
 
-    It("Placing outside of the board is error") {
+    Holds("Placing outside of the board is error") {
       reset >>
       place(X, (5, 5)).isError[Error](NotInTheBoard((5, 5)))
     }
 
-    It("Placing in the wrong turn") {
+    Holds("Placing in the wrong turn") {
       reset >>
       place(O, (1, 1)).isError[Error](WrongTurn(O))
     }
 
-    It("Turn must change") {
+    Holds("Turn must change") {
       (reset >>
         place(X, (1, 1)) >>
         currentTurnIs(O)) &&
@@ -45,7 +45,7 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
         currentTurnIs(X))
     }
 
-    It("Position must be occupied") {
+    Holds("Position must be occupied") {
       reset >>
       place(X, (1, 1)) >>
       in((1, 1)) isEqual Option(X)
@@ -62,29 +62,29 @@ trait TicTacToeSpec[P[_]] extends FunSpec[P] {
       place(O, (2, 0)) >>
       place(X, (0, 2))
 
-    It("Win at rows") {
+    Holds("Win at rows") {
       winnerBoard >>
       win(X)
     }
 
-    It("No simultaneous winners") {
+    Holds("No simultaneous winners") {
       winnerBoard >>
       win(O) map (! _)
     }
 
-    It("No winner if not over") {
+    Holds("No winner if not over") {
       reset >>
       winner map (! _.isDefined)
     }
   }
 
   Describe("Simulation behaviour") {
-    It("Unfinished match") {
+    Holds("Unfinished match") {
       reset >>
       simulate((0, 0), (0, 1))((1, 0), (1, 1)).isError[Error](NotEnoughMoves())
     }
 
-    It("Finished match") {
+    Holds("Finished match") {
       reset >>
       simulate((0, 0), (0, 1), (0, 2))((1, 0), (1, 1), (1, 2)) >>
       win(X)

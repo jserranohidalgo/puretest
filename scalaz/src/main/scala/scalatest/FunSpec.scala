@@ -1,10 +1,10 @@
 package org.hablapps.puretest
 package scalatestImpl
 
-trait ScalatestFunSpec[P[_]] extends org.scalatest.FunSpec 
+trait ScalatestFunSpec[P[_]] extends org.scalatest.FunSpec
   with org.scalatest.Matchers
   with FunSpec[P] {
-    
+
   implicit val Tester: Tester[P,Throwable]
 
   def Describe(subject: String)(test: => Unit): Unit =
@@ -15,6 +15,11 @@ trait ScalatestFunSpec[P[_]] extends org.scalatest.FunSpec
   def It[A](condition: String)(program: => P[A]): Unit =
     it(condition){
       program should runWithoutErrors
+    }
+
+  def Holds(condition: String)(program: => P[Boolean]): Unit =
+    it(condition){
+      program should beSatisfied
     }
 }
 

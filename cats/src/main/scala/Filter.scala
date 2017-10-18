@@ -4,13 +4,13 @@ import cats.{Monad, MonadError}
 import cats.data.StateT
 import cats.syntax.all._
 
-trait Filter[F[_]]{
+trait Filter[F[_]] {
   def filter[A](fa: F[A])(f: A => Boolean)(implicit
     F: sourcecode.File,
     L: sourcecode.Line): F[A]
 }
 
-object Filter{
+object Filter extends LowerFilterImplicits {
 
   def apply[F[_]](implicit S: Filter[F]) = S
 
@@ -48,6 +48,10 @@ object Filter{
 
   implicit def FilterForThrowable[F[_]: MonadError[?[_], Throwable]] =
     FilterForMonadError[F, Throwable](LocationException(_, _))
+
+}
+
+trait LowerFilterImplicits {
 
   implicit def FilterEither[E] = new Filter[Either[E, ?]] {
     def filter[A](fa: Either[E, A])(f: A => Boolean)(implicit F: sourcecode.File, L: sourcecode.Line): Either[E, A] =
