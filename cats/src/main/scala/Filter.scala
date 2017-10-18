@@ -32,22 +32,19 @@ object Filter{
     override def getMessage = toString
   }
 
-  def FilterForMonadError[F[_],E](implicit
-    error: (String, Location) => E,
-    merror: MonadError[F,E]) =
+  def FilterForMonadError[F[_], E](error: (String, Location) => E)(implicit
+      ME: MonadError[F, E]) =
     new Filter[F]{
       def filter[A](fa: F[A])(f: A => Boolean)(implicit
         F: sourcecode.File, L: sourcecode.Line): F[A] =
-        merror.flatMap(fa)(a =>
-          if (f(a)) a.pure[F] else merror.raiseError(error(a.toString,(F,L)))
+        ME.flatMap(fa)(a =>
+          if (f(a)) a.pure[F] else ME.raiseError(error(a.toString,(F,L)))
         )
     }
 
-  implicit def FilterForLocation[F[_]](
-    implicit merror: MonadError[F,Location]) =
-    FilterForMonadError((_,loc) => loc,merror)
+  implicit def FilterForLocation[F[_]: MonadError[?[_], Location]] =
+    FilterForMonadError((_, loc) => loc)
 
-  implicit def FilterForThrowable[F[_]](
-    implicit merror: MonadError[F,Throwable]) =
-    FilterForMonadError(LocationException(_,_), merror)
+  implicit def FilterForThrowable[F[_]: MonadError[?[_], Throwable]] =
+    FilterForMonadError[F, Throwable](LocationException(_, _))
 }
