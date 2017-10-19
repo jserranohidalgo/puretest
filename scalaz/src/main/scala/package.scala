@@ -4,16 +4,16 @@ package object puretest
   extends StateTMonadError
   with StateTEqual
   with StateTArbitrary
-  with StateValidationMonad
-  with TestingOps
-  with Errors {
+  with StateValidationMonad{
 
   type Location = (sourcecode.File, sourcecode.Line)
 
-  def simplifyLocation(location: Location): String = {
-    val fileext = raw".*/(.*)".r
-    val fileext(filename) = location._1.value
-    s"($filename:${location._2.value})"
-  }
+  /* matchers and ops */
+
+  implicit def toPureMatchers[P[_],A](p: P[A]) =
+    new PureMatchers(p)
+
+  implicit def toBooleanOps[P[_]](p: P[Boolean]) =
+    new BooleanOps(p)
 
 }
