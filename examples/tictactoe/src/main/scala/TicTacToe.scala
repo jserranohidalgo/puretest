@@ -71,7 +71,7 @@ object TicTacToe {
 
   // Errors
 
-  sealed abstract class Error extends Throwable
+  sealed abstract class Error
   case class OccupiedPosition(position: Position) extends Error
   case class NotInTheBoard(position: Position) extends Error
   case class WrongTurn(turn: Stone) extends Error

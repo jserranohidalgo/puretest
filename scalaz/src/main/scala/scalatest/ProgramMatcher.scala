@@ -24,7 +24,7 @@ object ProgramMatchers{
 
   object Syntax extends Syntax
 
-  implicit def matcher[P[_], E](implicit test: Tester[P,E]) =
+  implicit def matcher[P[_], E](implicit test: Tester[P, E]) =
     new ProgramMatchers[P]{
       import scalaz.\/
 

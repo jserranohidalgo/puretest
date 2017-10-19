@@ -5,13 +5,15 @@ package test
 import cats.syntax.all._
 
 trait TicTacToeSpec[P[_]] extends FunSpec[P] {
+  import TicTacToe._
 
   /* Evidence */
 
   val ticTacToe: TicTacToe[P]
+  implicit val ME: cats.MonadError[P, PuretestError[Error]]
 
   /* Predicates */
-  import ticTacToe._, TicTacToe._
+  import ticTacToe.{ME => _, _}
 
   Describe("Reset Spec") {
     Holds("First turn is X") {
