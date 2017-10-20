@@ -5,29 +5,29 @@ import scalaz.syntax.monadError._
 
 class PureMatchers[P[_], A](self: P[A]) {
 
-  def shouldFail[E](implicit ME: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[Unit] =
-    (self >>= { a =>
-      ME.raiseError[Unit](NotFailed(a)((F, L)))
-    }) handleError { _ => ().point[P] }
+  def attempt[E: MonadError[P, ?]]: P[Either[E, A]] =
+    (self map (Right(_): Either[E, A]))
+      .handleError(error => (Left(error): Either[E,A]).pure[P])
 
-  def shouldSucceed[E](implicit AE: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[A] =
-    self handleError {
-      case ApplicationError(e) => AE.raiseError(NotSucceeded(e)((F, L)))
-      case other => AE.raiseError(other)
+  def should[E](condition: Either[E,A] => Boolean,
+    errorIfSuccess: A => PureTestError[E],
+    errorIfFailure: E => PureTestError[E])(implicit
+    ME: MonadError[P, PureTestError[E]]): P[Unit] =
+    attempt(PureTestError.toMonadErrorApp).map{ result =>
+      if (condition(result)) ().pure[P]
+      else ME.raiseError(result.fold(errorIfFailure,errorIfSuccess))
     }
+
+  def shouldFail[E](implicit ME: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[Unit] =
+    should[E](_.isLeft, NotFailed(_)((F,L)), _ => ShouldNotHappen((F,L)))
+
+  def shouldSucceed[E](implicit AE: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[Unit] =
+    should[E](_.isRight, _ => ShouldNotHappen((F,L)), NotSucceeded(_)((F, L)))
 
   def shouldFail[E](e: E)(implicit ME: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[Unit] =
-    (self >>= { a =>
-      ME.raiseError[Unit](NotError(a, e)((F, L)))
-    }) handleError {
-      case ApplicationError(`e`) => ().pure[P]
-      case ApplicationError(other) => ME.raiseError(OtherError[E](other, e)((F, L)))
-      case other => ME.raiseError(other)
-    }
+    should[E](_ == Left(e), NotError(_, e)((F,L)), OtherError(_, e)((F,L)))
 
-  def shouldBe[E](a2: A)(implicit AE: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[Unit] =
-    self >>= { a1 =>
-      if (a1 == a2) ().pure[P]
-      else AE.raiseError(NotEqualTo(a1, a2)((F, L)))
-    }
+  def shouldBe[E](a: A)(implicit AE: MonadError[P, PureTestError[E]], F: sourcecode.File, L: sourcecode.Line): P[Unit] =
+    should[E](_ == Right(a), NotEqualTo(_, a)((F,L)), NotValue(_, a)((F,L)))
+
 }
