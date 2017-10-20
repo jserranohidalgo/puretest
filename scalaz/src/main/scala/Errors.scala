@@ -37,26 +37,32 @@ import PureTestError.simplifyLocation
 
 case class ApplicationError[E](e: E) extends PureTestError[E](s"Application error: $e")
 
-case class NotEqualTo[E,A](found: A, expected: A)(location: Location)
+case class NotEqualTo[E,A](found: A, expected: A)(implicit location: Location)
   extends PureTestError[E](s"Value $expected expected but found value $found ${simplifyLocation(location)}")
 
-case class NotFailed[E,A](found: A)(location: Location)
+case class NotFailed[E,A](found: A)(implicit location: Location)
   extends PureTestError[E](s"Error expected but found value $found ${simplifyLocation(location)}")
 
-case class NotSucceeded[E](found: E)(location: Location)
+case class NotSucceeded[E](found: E)(implicit location: Location)
   extends PureTestError[E](s"Value expected but found error $found ${simplifyLocation(location)}")
 
-case class NotError[A, E](found: A, expected: E)(location: Location)
+case class NotError[A, E](found: A, expected: E)(implicit location: Location)
   extends PureTestError[E](s"Error $expected expected but found value $found ${simplifyLocation(location)}")
 
-case class NotValue[A, E](found: E, expected: A)(location: Location)
+case class NotValue[A, E](found: E, expected: A)(implicit location: Location)
   extends PureTestError[E](s"Value $expected expected but found error $found ${simplifyLocation(location)}")
 
-case class OtherError[E](found: E, expected: E)(location: Location)
+case class OtherError[E](found: E, expected: E)(implicit location: Location)
   extends PureTestError[E](s"Error $expected expected but found error $found ${simplifyLocation(location)}")
 
-case class FilterError[E](found: String)(location: Location)
+case class FilterError[E](found: String)(implicit location: Location)
   extends PureTestError[E](s"$found doesn't match expected pattern ${simplifyLocation(location)}")
 
-case class ShouldNotHappen[E](location: Location)
+case class NotMatched[A,E](found: A)(implicit location: Location)
+  extends PureTestError[E](s"Found value $found doesn't match expected pattern ${simplifyLocation(location)}")
+
+case class NotMatchedFailure[E](found: E)(implicit location: Location)
+  extends PureTestError[E](s"Found error $found doesn't match expected pattern ${simplifyLocation(location)}")
+
+case class ShouldNotHappen[E](implicit location: Location)
   extends PureTestError[E](s"This error shouldn't be thrown ${simplifyLocation(location)}")

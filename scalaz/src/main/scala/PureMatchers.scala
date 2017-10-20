@@ -7,24 +7,46 @@ class PureMatchers[P[_], A, E](self: P[A])(implicit
   ME: MonadError[P, PureTestError[E]],
   loc: Location){
 
-  def should(condition: Either[E,A] => Boolean,
+  def shouldFail(p: E => Boolean,
     errorIfSuccess: A => PureTestError[E],
     errorIfFailure: E => PureTestError[E]): P[Unit] =
-    self.attempt(PureTestError.toMonadErrorApp).map{ result =>
-      if (condition(result)) ().pure[P]
-      else ME.raiseError(result.fold(errorIfFailure,errorIfSuccess))
+    self.map(Option[A](_)).handleError{
+      case ApplicationError(error) =>
+        if (p(error)) Option.empty[A].point[P]
+        else ME.raiseError[Option[A]](errorIfFailure(error))
+      case _ => Option.empty[A].point[P]
+    }.flatMap{
+      case Some(a) => ME.raiseError(errorIfSuccess(a))
+      case None => ().point[P]
     }
 
-  def shouldFail: P[Unit] =
-    should(_.isLeft, NotFailed(_)(loc), _ => ShouldNotHappen(loc))
+  def shouldMatchFailure(p: E => Boolean): P[Unit] =
+    shouldFail(p, NotFailed(_), NotMatchedFailure(_))
 
-  def shouldSucceed: P[Unit] =
-    should(_.isRight, _ => ShouldNotHappen(loc), NotSucceeded(_)(loc))
+  def shouldFail: P[Unit] =
+    shouldFail(_ => true, NotFailed(_), _ => ShouldNotHappen())
 
   def shouldFail(e: E): P[Unit] =
-    should(_ == Left(e), NotError(_, e)(loc), OtherError(_, e)(loc))
+    shouldFail(_ == e, NotError(_, e), OtherError(_, e))
 
-  def shouldBe(a: A): P[Unit] =
-    should(_ == Right(a), NotEqualTo(_, a)(loc), NotValue(_, a)(loc))
+  def shouldSucceed(p: A => Boolean,
+    errorIfSuccess: A => PureTestError[E],
+    errorIfFailure: E => PureTestError[E]): P[A] =
+    self.handleError{
+      case ApplicationError(error) =>
+        ME.raiseError[A](errorIfFailure(error))
+      case _ => self
+    }.flatMap{
+      a => if (p(a)) a.point[P]
+        else ME.raiseError[A](errorIfSuccess(a))
+    }
 
+  def shouldMatch(p: A => Boolean): P[A] =
+    shouldSucceed(p, NotMatched(_), NotSucceeded(_))
+
+  def shouldBe(a: A): P[A] =
+    shouldSucceed(_ == a, NotEqualTo(_, a), NotValue(_, a))
+
+  def shouldSucceed: P[A] =
+    shouldSucceed(_ => true, _ => ShouldNotHappen(), NotSucceeded(_))
 }
