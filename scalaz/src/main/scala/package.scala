@@ -8,6 +8,8 @@ package object puretest
 
   type Location = (sourcecode.File, sourcecode.Line)
 
+  implicit def loc(implicit f: sourcecode.File, l: sourcecode.Line) = (f,l)
+
   /* matchers and ops */
 
   implicit def toPureMatchers[P[_],A](p: P[A]) =
