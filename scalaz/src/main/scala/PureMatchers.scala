@@ -10,9 +10,9 @@ class PureMatchers[P[_], A, E](self: P[A])(implicit
   def shouldFail(p: E => Boolean,
     errorIfSuccess: A => PureTestError[E],
     errorIfFailure: E => PureTestError[E]): P[Unit] =
-    (self >>= { a: A => 
+    self.flatMap{ a: A => 
       ME.raiseError[Unit](errorIfSuccess(a))
-    }).recoverWith[PureTestError[E]]{
+    }.recoverWith[PureTestError[E]]{
       case ApplicationError(error) =>
         if (p(error)) ().point[P]
         else ME.raiseError(errorIfFailure(error))
@@ -30,13 +30,25 @@ class PureMatchers[P[_], A, E](self: P[A])(implicit
   def shouldSucceed(p: A => Boolean,
     errorIfSuccess: A => PureTestError[E],
     errorIfFailure: E => PureTestError[E]): P[A] =
-    self.recoverWith[PureTestError[E]]{
+    self.attempt flatMap { _.fold(
+    {
       case ApplicationError(error) =>
         ME.raiseError[A](errorIfFailure(error))
-    }.flatMap{
+      case error => 
+        ME.raiseError(error)
+    },
+    {
       a => if (p(a)) a.point[P]
         else ME.raiseError[A](errorIfSuccess(a))
-    }
+    })}
+
+    // self.recoverWith[PureTestError[E]]{
+    //   case ApplicationError(error) =>
+    //     ME.raiseError[A](errorIfFailure(error))
+    // }.flatMap{
+    //   a => if (p(a)) a.point[P]
+    //     else ME.raiseError[A](errorIfSuccess(a))
+    // }
 
   def shouldMatch(p: A => Boolean): P[A] =
     shouldSucceed(p, NotMatched(_), NotSucceeded(_))
