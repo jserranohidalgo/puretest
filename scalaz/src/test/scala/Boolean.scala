@@ -8,8 +8,7 @@ import Filter.syntax._
 trait BooleanPrograms[P[_]]{
 
   val MS: MonadState[P, Int]
-  implicit val ME: MonadError[P, Throwable]
-  implicit val RE: RaiseError[P, PureTestError[Throwable]]
+  implicit val ME: MonadError[P, PureTestError[Throwable]]
 
   def trueProgram: P[Boolean] = for {
     _ <- MS.put(1)
@@ -30,11 +29,9 @@ trait BooleanPrograms[P[_]]{
 
 object BooleanPrograms{
   def apply[P[_]](implicit _MS: MonadState[P,Int], 
-    _ME: MonadError[P,Throwable],
-    _RE: RaiseError[P,PureTestError[Throwable]]) =
+    _ME: MonadError[P,PureTestError[Throwable]]) =
     new BooleanPrograms[P]{
       val MS = _MS
       val ME = _ME
-      val RE = _RE
     }
 }

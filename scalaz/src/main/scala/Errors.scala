@@ -23,6 +23,8 @@ object PureTestError {
       case ApplicationError(e) => Some(e)
       case _ => None
     }
+
+
 }
 
 import PureTestError.simplifyLocation
@@ -47,14 +49,11 @@ case class NotValue[A, E](found: E, expected: A)(implicit location: Location)
 case class OtherError[E](found: E, expected: E)(implicit location: Location)
   extends PureTestError[E](s"Error $expected expected but found error $found ${simplifyLocation(location)}")
 
-case class FilterError[E](found: String)(implicit location: Location)
-  extends PureTestError[E](s"$found doesn't match expected pattern ${simplifyLocation(location)}")
-
 case class NotMatched[A,E](found: A)(implicit location: Location)
-  extends PureTestError[E](s"Found value $found doesn't match expected pattern ${simplifyLocation(location)}")
+  extends PureTestError[E](s"Expected pattern doesn't match found value $found ${simplifyLocation(location)}")
 
 case class NotMatchedFailure[E](found: E)(implicit location: Location)
-  extends PureTestError[E](s"Found error $found doesn't match expected pattern ${simplifyLocation(location)}")
+  extends PureTestError[E](s"Expected pattern doesn't match found error $found ${simplifyLocation(location)}")
 
 case class ShouldNotHappen[E](implicit location: Location)
-  extends PureTestError[E](s"This error shouldn't be thrown ${simplifyLocation(location)}")
+  extends PureTestError[E](s"This error shouldn't ever be thrown ${simplifyLocation(location)}")

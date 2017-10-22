@@ -24,8 +24,7 @@ object Filter{
   }
 
   implicit def FilterForMonadError[F[_], E](implicit
-      merror: RaiseError[F, PureTestError[E]],
-      merrorApp: MonadError[F, E]) =
+      merror: MonadError[F, PureTestError[E]]) =
     new Filter[F] {
       def filter[A](fa: F[A])(f: A => Boolean)(implicit
         F: sourcecode.File, L: sourcecode.Line): F[A] =
