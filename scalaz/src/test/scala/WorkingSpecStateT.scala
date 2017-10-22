@@ -10,8 +10,8 @@ import scalaz._, Scalaz._
 import WorkingProgram.Error, WorkingSpecStateT.Program
 
 class WorkingSpecStateT extends WorkingSpec.Scalatest[Program](
-  WorkingProgram[Program],
-  MonadError[Program,PureTestError[Error]],
+  WorkingProgram[Program](implicitly, toMonadError[Program,Error,PureTestError[Error]]),
+  RaiseError[Program,PureTestError[Error]],
   StateTester[Program,Int,PureTestError[Error]].apply(0)
 )
 

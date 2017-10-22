@@ -4,20 +4,19 @@ import scalaz.{Functor, Monad, MonadError}
 import scalaz.syntax.monadError._
 
 class PureMatchers[P[_], A, E](self: P[A])(implicit
-  ME: MonadError[P, PureTestError[E]],
+  RE: RaiseError[P, PureTestError[E]],
+  ME: MonadError[P, E],
   loc: Location){
 
   def shouldFail(p: E => Boolean,
     errorIfSuccess: A => PureTestError[E],
     errorIfFailure: E => PureTestError[E]): P[Unit] =
-    self.map(Option[A](_)).handleError{
-      case ApplicationError(error) =>
-        if (p(error)) Option.empty[A].point[P]
-        else ME.raiseError[Option[A]](errorIfFailure(error))
-      case _ => Option.empty[A].point[P]
-    }.flatMap{
-      case Some(a) => ME.raiseError(errorIfSuccess(a))
-      case None => ().point[P]
+    (self >>= { a: A => 
+      RE.raiseError[Unit](errorIfSuccess(a))
+    }).handleError{
+      case error =>
+        if (p(error)) ().point[P]
+        else RE.raiseError(errorIfFailure(error))
     }
 
   def shouldMatchFailure(p: E => Boolean): P[Unit] =
@@ -33,12 +32,11 @@ class PureMatchers[P[_], A, E](self: P[A])(implicit
     errorIfSuccess: A => PureTestError[E],
     errorIfFailure: E => PureTestError[E]): P[A] =
     self.handleError{
-      case ApplicationError(error) =>
-        ME.raiseError[A](errorIfFailure(error))
-      case _ => self
+      case error =>
+        RE.raiseError[A](errorIfFailure(error))
     }.flatMap{
       a => if (p(a)) a.point[P]
-        else ME.raiseError[A](errorIfSuccess(a))
+        else RE.raiseError[A](errorIfSuccess(a))
     }
 
   def shouldMatch(p: A => Boolean): P[A] =

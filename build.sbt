@@ -55,7 +55,8 @@ lazy val scalaz = project
     commonSettings,
     name := "puretest-scalaz",
     libraryDependencies ++= Seq(
-      "org.scalaz" %% "scalaz-core" % "7.2.9"
+      "org.scalaz" %% "scalaz-core" % "7.2.9",
+      "com.chuusai" %% "shapeless" % "2.3.2"
     ))
 
 lazy val tictactoe = (project in file("examples/tictactoe"))

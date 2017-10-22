@@ -9,7 +9,7 @@ import scalaz._, Scalaz._
 import BooleanSpecStateT.Program
 
 class BooleanSpecStateT extends BooleanSpec.Scalatest[Program](
-  BooleanPrograms[Program],
+  BooleanPrograms[Program](implicitly, toMonadError[Program,Throwable,PureTestError[Throwable]], implicitly),
   StateTester[Program,Int,PureTestError[Throwable]].apply(0)
 )
 

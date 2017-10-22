@@ -9,8 +9,8 @@ import WorkingProgram.Error
 
 trait WorkingSpec[P[_]] extends FunSpec[P] {
   val S: WorkingProgram[P]
-  import S.{ME => _, _}
-  implicit val ME: MonadError[P, PureTestError[Error]]
+  import S._
+  implicit val RE: RaiseError[P, PureTestError[Error]]
 
   Describe("Working programs"){
 
@@ -38,7 +38,7 @@ trait WorkingSpec[P[_]] extends FunSpec[P] {
 object WorkingSpec{
   class Scalatest[P[_]](
     val S: WorkingProgram[P],
-    val ME: MonadError[P,PureTestError[Error]],
+    val RE: RaiseError[P,PureTestError[Error]],
     val Tester: Tester[P,PureTestError[Error]])
   extends scalatestImpl.ScalatestFunSpec[P,Error]
   with WorkingSpec[P]
