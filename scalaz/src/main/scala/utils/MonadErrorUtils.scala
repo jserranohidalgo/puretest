@@ -21,5 +21,10 @@ trait MonadErrorUtils{
     def attempt[E: MonadError[P, ?]]: P[Either[E, A]] =
       (self map (Right(_): Either[E, A]))
         .handleError(error => (Left(error): Either[E,A]).pure[P])
+
+    def recoverWith[E: MonadError[P,?]](pf: PartialFunction[E,P[A]]): P[A] = 
+      self.handleError{ e => 
+        pf applyOrElse(e, (_: E).raiseError[P,A])
+      }
   }
 }
