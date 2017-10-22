@@ -9,8 +9,8 @@ import WorkingProgram.Error
 
 trait WorkingSpec[P[_]] extends FunSpec[P] {
   val S: WorkingProgram[P]
-  import S.{ME => _, _}
-  implicit val ME: MonadError[P, PureTestError[Error]]
+  import S._
+  implicit val RE: RaiseError[P, PureTestError[Error]]
 
   Describe("ShouldSucceed"){
 
@@ -59,30 +59,12 @@ trait WorkingSpec[P[_]] extends FunSpec[P] {
     }
   }
 
-  Describe("ShouldFail over puretest programs"){
-    It("shouldn't work with working programs"){
-      workingProgram.shouldFail // shouldFail
-    }
-
-    It("shouldn't work with working programs (II)"){
-      (for {
-        2 <- workingProgramWithHandledError
-      } yield ()).shouldFail
-    }
-
-    It("should fail if it doesn't pattern match"){
-      (for {
-        _ <- MS.put(1)
-        2 <- MS.get
-      } yield ()) // .shouldFail
-    }
-  }
 }
 
 object WorkingSpec{
   class Scalatest[P[_]](
     val S: WorkingProgram[P],
-    val ME: MonadError[P,PureTestError[Error]],
+    val RE: RaiseError[P,PureTestError[Error]],
     val Tester: Tester[P,PureTestError[Error]])
   extends scalatestImpl.ScalatestFunSpec[P,Error]
   with WorkingSpec[P]

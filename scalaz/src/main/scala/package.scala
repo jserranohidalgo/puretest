@@ -13,10 +13,10 @@ package object puretest
 
   /* matchers and ops */
 
-  import scalaz.MonadError
+  import scalaz.Monad
 
   implicit def toPureMatchers[P[_], A, E](self: P[A])(implicit
-    ME: MonadError[P, PureTestError[E]],
+    M: Monad[P], HE: HandleError[P,E], RE: RaiseError[P, PureTestError[E]],
     loc: Location) = new PureMatchers(self)
 
   implicit def toBooleanOps[P[_]](p: P[Boolean]) =

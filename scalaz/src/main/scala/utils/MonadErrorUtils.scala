@@ -17,6 +17,19 @@ trait MonadErrorUtils{
       }
   }
 
+  trait HandleError[P[_],E]{
+    def handleError[A](p: P[A])(f: E => P[A]): P[A]
+  }
+
+  object HandleError{
+    def apply[P[_],E](implicit HE: HandleError[P,E]) = HE
+
+    implicit def fromMonadError[P[_],E](implicit ME: MonadError[P,E]) = 
+      new HandleError[P,E]{
+        def handleError[A](p: P[A])(f: E => P[A]) = ME.handleError(p)(f)
+      }
+  }
+
   implicit class MonadErrorOps[P[_],A](self: P[A]){
     def attempt[E: MonadError[P, ?]]: P[Either[E, A]] =
       (self map (Right(_): Either[E, A]))
