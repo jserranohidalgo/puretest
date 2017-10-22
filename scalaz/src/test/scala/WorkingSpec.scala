@@ -55,7 +55,7 @@ trait WorkingSpec[P[_]] extends FunSpec[P] {
     }
 
     It("should work if error pattern is matched"){
-      failingProgram shouldMatchFailure( _ == Error(0))
+      failingProgram shouldMatchFailure[Error]( _ == Error(0))
     }
   }
 
