@@ -4,7 +4,9 @@ package org.hablapps.puretest
  * Puretest errors
  */
 
-sealed abstract class PureTestError[E](msg: String) extends RuntimeException(msg)
+sealed abstract class PureTestError[E](msg: String) extends RuntimeException(msg){
+  override def toString = msg
+}
 
 object PureTestError {
   import scalaz.{MonadError, ~>}
