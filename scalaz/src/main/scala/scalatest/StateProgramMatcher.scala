@@ -1,7 +1,7 @@
 package org.hablapps.puretest
 package scalatestImpl
 
-import org.scalatest._, matchers._, Matchers._
+import org.scalatest._
 
 trait ProgramStateMatchers[P[_],S]{
   def apply(from: S): ProgramMatchers[P]

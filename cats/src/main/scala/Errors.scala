@@ -12,7 +12,7 @@ trait Errors {
   }
 
   object PuretestError {
-    import cats.{MonadError, ~>}
+    import cats.~>
 
     implicit def eitherToPuretestError[E] =
       λ[Either[E, ?] ~> Either[PuretestError[E], ?]] {

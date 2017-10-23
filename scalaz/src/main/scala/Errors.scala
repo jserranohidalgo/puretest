@@ -1,5 +1,7 @@
 package org.hablapps.puretest
 
+import scalaz.MonadError
+
 /**
  * Puretest errors
  */
@@ -9,7 +11,6 @@ sealed abstract class PureTestError[E](msg: String) extends RuntimeException(msg
 }
 
 object PureTestError {
-  import scalaz.{MonadError, ~>}
 
   def simplifyLocation(location: Location): String = {
     val fileext = raw".*/(.*)".r

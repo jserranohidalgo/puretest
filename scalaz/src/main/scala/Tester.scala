@@ -25,7 +25,7 @@ object Tester {
   /* Testing asynch programs */
 
   import scala.concurrent.{Await, Future, duration}, duration._
-  import scala.util.Try, scalaz.syntax.std.`try`._
+  import scala.util.Try
   import scala.util.{Success, Failure}
 
   implicit def futureTester =

@@ -1,9 +1,9 @@
 lazy val commonSettings = Seq(
   organization := "org.hablapps",
   version := "0.3-SNAPSHOT",
-  scalaVersion := "2.12.0",
-  scalaOrganization := "org.typelevel",
-  crossScalaVersions := Seq("2.11.8", "2.12.0"),
+  scalaVersion := "2.12.3",
+  // scalaOrganization := "org.typelevel",
+  crossScalaVersions := Seq("2.11.8", "2.12.3"),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
   // addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.full),
   libraryDependencies ++= Seq(
@@ -27,6 +27,7 @@ lazy val commonSettings = Seq(
     "-unchecked",
     "-deprecation",
     "-Ypartial-unification",
+    "-Ywarn-unused-import",
     // "-Xprint:typer",
     // "-Xlog-implicit-conversions",
     "-feature",

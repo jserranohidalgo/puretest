@@ -1,7 +1,6 @@
 package org.hablapps.puretest
 
-import scalaz.{Monad, MonadError, StateT}
-import scalaz.syntax.monadError._
+import scalaz.Monad
 
 trait Filter[F[_]] {
   def filter[A](fa: F[A])(f: A => Boolean)(implicit

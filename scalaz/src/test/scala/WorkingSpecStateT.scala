@@ -2,10 +2,8 @@ package org.hablapps
 package puretest
 package test
 
-import org.scalatest._
-import puretest.{Filter => TestFilter}, scalatestImpl._
 
-import scalaz._, Scalaz._
+import scalaz._
 
 import WorkingProgram.Error, WorkingSpecStateT.Program
 

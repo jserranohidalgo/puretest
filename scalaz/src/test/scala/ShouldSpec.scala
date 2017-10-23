@@ -1,7 +1,6 @@
 package org.hablapps.puretest
 package test
 
-import scalaz.{MonadState, MonadError}
 import scalaz.syntax.monad._
 import WorkingProgram.Error
 

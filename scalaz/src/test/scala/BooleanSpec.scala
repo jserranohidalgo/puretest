@@ -1,9 +1,6 @@
 package org.hablapps.puretest
 package test
 
-import scalaz.{MonadState, MonadError}
-import scalaz.syntax.monad._
-
 trait BooleanSpec[P[_]] extends BooleanPrograms[P]{
 
   Describe("Boolean programs"){
@@ -43,6 +40,8 @@ trait BooleanSpec[P[_]] extends BooleanPrograms[P]{
 }
 
 object BooleanSpec{
+  import scalaz.{MonadState, MonadError}
+
   class Scalatest[P[_]](
     val MS: MonadState[P,Int],
     val ME: MonadError[P,Throwable],

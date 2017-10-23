@@ -10,7 +10,7 @@ trait StateTester[P[_], S, E] {
 object StateTester {
   def apply[P[_], S, E](implicit T: StateTester[P, S, E]) = T
 
-  import scalaz.{Monad, \/, StateT}
+  import scalaz.{Monad, StateT}
 
   implicit def StateTStateTester[E, F[_]: Tester[?[_], E]: Monad, S] =
     new StateTester[StateT[F, S, ?], S, E] {
