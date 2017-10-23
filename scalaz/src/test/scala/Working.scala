@@ -3,7 +3,6 @@ package test
 
 import scalaz.{MonadState, MonadError}
 import scalaz.syntax.monadError._
-import Filter.syntax._
 
 /** Programs */
 

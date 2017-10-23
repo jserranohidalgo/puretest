@@ -1,7 +1,6 @@
 package org.hablapps.puretest
 
-import cats.{Applicative, FlatMap, MonadError, ~>}
-import cats.data.StateT
+import cats.MonadError
 
 object Implicits {
 

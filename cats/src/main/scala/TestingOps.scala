@@ -1,6 +1,6 @@
 package org.hablapps.puretest
 
-import cats.{ApplicativeError, Functor, Monad, MonadError}
+import cats.{ApplicativeError, MonadError}
 import cats.syntax.all._
 
 /**

@@ -1,7 +1,7 @@
 package org.hablapps.puretest
 package scalatestImpl
 
-import org.scalatest._, matchers._, Matchers._
+import org.scalatest._, matchers._
 
 /**
  * Program matcher
@@ -26,7 +26,6 @@ object ProgramMatchers{
 
   implicit def matcher[P[_], E](implicit test: Tester[P, E]) =
     new ProgramMatchers[P]{
-      import scalaz.\/
 
       def beSatisfied = new Matcher[P[Boolean]]{
         def apply(program: P[Boolean]) =

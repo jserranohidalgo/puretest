@@ -1,6 +1,6 @@
 package org.hablapps.puretest
 
-import scalaz.{Functor, Monad, MonadError}
+import scalaz.{Functor, Monad}
 import scalaz.syntax.monadError._
 
 class BooleanOps[P[_]](self: P[Boolean]) {
