@@ -20,13 +20,25 @@ object PureTestError {
   implicit def toPureTestError[E](e: E): PureTestError[E] =
     ApplicationError(e)
 
-  implicit def fromPureTestError[E](e: PureTestError[E]): Option[E] = 
+  implicit def fromPureTestError[E](e: PureTestError[E]): Option[E] =
     e match {
       case ApplicationError(e) => Some(e)
       case _ => None
     }
 
-
+  implicit def toMonadError[P[_],E](implicit
+    ME: MonadError[P,PureTestError[E]]) =
+    new MonadError[P,E]{
+      def point[A](a: => A) = ME.point(a)
+      def bind[A,B](p: P[A])(f: A => P[B]) = ME.bind(p)(f)
+      def raiseError[A](e: E) =
+        ME.raiseError(toPureTestError(e))
+      def handleError[A](p: P[A])(f: E => P[A]) =
+        ME.handleError(p){ e2 => fromPureTestError(e2) match {
+          case Some(e1) => f(e1)
+          case None => ME.raiseError(e2)
+        }}
+    }
 }
 
 import PureTestError.simplifyLocation
