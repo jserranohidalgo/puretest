@@ -4,14 +4,20 @@ package object puretest
   extends StateTMonadError
   with StateTEqual
   with StateTArbitrary
-  with StateValidationMonad{
+  with StateValidationMonad
+  with MonadErrorUtils{
 
   type Location = (sourcecode.File, sourcecode.Line)
 
+  implicit def loc(implicit f: sourcecode.File, l: sourcecode.Line) = (f,l)
+
   /* matchers and ops */
 
-  implicit def toPureMatchers[P[_],A](p: P[A]) =
-    new PureMatchers(p)
+  import scalaz.Monad
+
+  implicit def toPureMatchers[P[_], A, E](self: P[A])(implicit
+    M: Monad[P], HE: HandleError[P,E], RE: RaiseError[P, PureTestError[E]],
+    loc: Location) = new PureMatchers(self)
 
   implicit def toBooleanOps[P[_]](p: P[Boolean]) =
     new BooleanOps(p)

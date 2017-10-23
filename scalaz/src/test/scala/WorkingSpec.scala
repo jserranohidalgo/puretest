@@ -9,36 +9,62 @@ import WorkingProgram.Error
 
 trait WorkingSpec[P[_]] extends FunSpec[P] {
   val S: WorkingProgram[P]
-  import S.{ME => _, _}
-  implicit val ME: MonadError[P, PureTestError[Error]]
+  import S._
+  implicit val RE: RaiseError[P, PureTestError[Error]]
 
-  Describe("Working programs"){
+  Describe("ShouldSucceed"){
 
-    It("should pass if work"){
+    It("should work with working programs"){
       workingProgram.shouldSucceed >>
       workingProgramWithHandledError.shouldSucceed
     }
 
-    It("should fail if it doesn't work"){
-      failingProgram.shouldFail
+    It("is redundant with working programs"){
+      workingProgram >>
+      workingProgramWithHandledError
     }
 
-    It("should fail if it desn't pattern match"){
+    It("should work when the exact value is checked"){
+      workingProgram.shouldBe(1)
+    }
+
+    It("should work if patterns are matched"){
+      (workingProgramWithHandledError shouldMatch { _ == 2 }) >>
+      ((MS.put(2) >> MS.get) shouldMatch { _ == 2 })
+    }
+
+    It("should work if patterns are matched (for-comprehension)"){
       (for {
-        Error(2) <- workingProgramWithHandledError
-      } yield ()).shouldFail >>
+        2 <- workingProgramWithHandledError
+      } yield ()) >>
       (for {
-        _ <- MS.put(1)
+        _ <- MS.put(2)
         2 <- MS.get
-      } yield ()).shouldFail
+      } yield ())
     }
   }
+
+  Describe("ShouldFail"){
+
+    It("should work with failing programs"){
+      failingProgram shouldFail
+    }
+
+    It("should work when the exact error is checked"){
+      failingProgram shouldFail(Error(0))
+    }
+
+    It("should work if error pattern is matched"){
+      failingProgram shouldMatchFailure[Error]( _ == Error(0))
+    }
+  }
+
 }
 
 object WorkingSpec{
   class Scalatest[P[_]](
     val S: WorkingProgram[P],
-    val ME: MonadError[P,PureTestError[Error]],
+    val RE: RaiseError[P,PureTestError[Error]],
     val Tester: Tester[P,PureTestError[Error]])
   extends scalatestImpl.ScalatestFunSpec[P,Error]
   with WorkingSpec[P]

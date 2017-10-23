@@ -23,17 +23,12 @@ object Filter{
     }
   }
 
-  def FilterForMonadError[F[_], E](error: (String, Location) => E)(implicit
-      merror: MonadError[F, E]) =
+  implicit def FilterForMonadError[F[_], E](implicit
+      M: Monad[F], HE: HandleError[F,E], RE: RaiseError[F, PureTestError[E]]) =
     new Filter[F] {
       def filter[A](fa: F[A])(f: A => Boolean)(implicit
         F: sourcecode.File, L: sourcecode.Line): F[A] =
-        merror.bind(fa)(a =>
-          if (f(a)) a.point[F] else merror.raiseError(error(a.toString, (F, L)))
-        )
+        fa shouldMatch f
     }
 
-  implicit def FilterForPureTestError[F[_],E](
-      implicit merror: MonadError[F, PureTestError[E]]) =
-    FilterForMonadError[F, PureTestError[E]]((s,l) => FilterError(s)(l))
 }

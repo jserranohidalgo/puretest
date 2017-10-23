@@ -14,12 +14,15 @@ trait WorkingProgram[P[_]]{
   val MS: MonadState[P,Int]
   implicit val ME: MonadError[P,Error]
 
-  def workingProgram: P[Unit] =
-    ().point[P]
+  def workingProgram: P[Int] =
+    1.point[P]
 
-  def workingProgramWithHandledError: P[Error] =
-    Error(1).raiseError[P,Error] handleError {
-      _.point[P]
+  def workingProgramReturnsOne: P[Int] = 
+    1.point[P]
+
+  def workingProgramWithHandledError: P[Int] =
+    (1.point[P] >> Error(1).raiseError[P,Int]) handleError {
+      _ => 2.point[P]
     }
 
   def failingProgram: P[Unit] =
