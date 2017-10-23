@@ -7,10 +7,9 @@ import Filter.syntax._
 
 import WorkingProgram.Error
 
-trait WorkingSpec[P[_]] extends FunSpec[P] {
+trait WorkingSpec[P[_]] extends FunSpec[P,Error] {
   val S: WorkingProgram[P]
   import S._
-  implicit val RE: RaiseError[P, PureTestError[Error]]
 
   Describe("ShouldSucceed"){
 

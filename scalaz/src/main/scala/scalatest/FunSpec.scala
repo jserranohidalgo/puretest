@@ -3,7 +3,7 @@ package scalatestImpl
 
 trait ScalatestFunSpec[P[_],E] extends org.scalatest.FunSpec
   with org.scalatest.Matchers
-  with FunSpec[P] {
+  with FunSpec[P,E] {
 
   implicit val Tester: Tester[P,PureTestError[E]]
 

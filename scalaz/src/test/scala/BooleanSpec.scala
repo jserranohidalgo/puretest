@@ -5,9 +5,7 @@ import scalaz.{MonadState, MonadError}
 import scalaz.syntax.monad._
 import Filter.syntax._
 
-trait BooleanSpec[P[_]] extends FunSpec[P] {
-  val S: BooleanPrograms[P]
-  import S._
+trait BooleanSpec[P[_]] extends BooleanPrograms[P]{
 
   Describe("Boolean programs"){
     Holds("if return true"){
@@ -47,7 +45,9 @@ trait BooleanSpec[P[_]] extends FunSpec[P] {
 
 object BooleanSpec{
   class Scalatest[P[_]](
-    val S: BooleanPrograms[P],
+    val MS: MonadState[P,Int],
+    val ME: MonadError[P,Throwable],
+    val RE: RaiseError[P,PureTestError[Throwable]],
     val Tester: Tester[P,PureTestError[Throwable]])
   extends scalatestImpl.ScalatestFunSpec[P,Throwable] with BooleanSpec[P]
 }
