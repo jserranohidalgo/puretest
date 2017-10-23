@@ -10,7 +10,6 @@ trait ShouldSpec[P[_]] extends FunSpec[P,PureTestError[Error]] {
   import S._
 
   implicit val RE1: RaiseError[P, PureTestError[Error]]
-  implicit val HE1: HandleError[P, PureTestError[Error]]
 
   Describe("ShouldFail should fail"){
     It("with working programs"){
@@ -85,7 +84,7 @@ object ShouldSpec{
   class Scalatest[P[_]](
     val S: WorkingProgram[P],
     val RE1: RaiseError[P, PureTestError[Error]],
-    val HE1: HandleError[P, PureTestError[Error]],
+    val HE: HandleError[P, PureTestError[Error]],
     val RE: RaiseError[P, PureTestError[PureTestError[Error]]],
     val Tester: Tester[P,PureTestError[PureTestError[Error]]])
   extends scalatestImpl.ScalatestFunSpec[P,PureTestError[Error]]
