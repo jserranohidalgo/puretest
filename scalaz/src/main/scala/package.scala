@@ -5,7 +5,8 @@ package object puretest
   with StateTEqual
   with StateTArbitrary
   with StateValidationMonad
-  with MonadErrorUtils{
+  with MonadErrorUtils
+  with Filter.Syntax{
 
   type Location = (sourcecode.File, sourcecode.Line)
 

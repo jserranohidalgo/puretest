@@ -3,7 +3,6 @@ package test
 
 import scalaz.{MonadState, MonadError}
 import scalaz.syntax.monadError._
-import Filter.syntax._
 
 /** Programs */
 
@@ -17,7 +16,7 @@ trait WorkingProgram[P[_]]{
   def workingProgram: P[Int] =
     1.point[P]
 
-  def workingProgramReturnsOne: P[Int] = 
+  def workingProgramReturnsOne: P[Int] =
     1.point[P]
 
   def workingProgramWithHandledError: P[Int] =

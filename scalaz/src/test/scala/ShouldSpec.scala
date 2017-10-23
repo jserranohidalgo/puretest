@@ -2,9 +2,7 @@ package org.hablapps.puretest
 package test
 
 import scalaz.{MonadState, MonadError}
-import scalaz.syntax.monadError._
-import Filter.syntax._
-
+import scalaz.syntax.monad._
 import WorkingProgram.Error
 
 trait ShouldSpec[P[_]] extends FunSpec[P,PureTestError[Error]] {

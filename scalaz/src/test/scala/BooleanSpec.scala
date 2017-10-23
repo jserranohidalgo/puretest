@@ -3,7 +3,6 @@ package test
 
 import scalaz.{MonadState, MonadError}
 import scalaz.syntax.monad._
-import Filter.syntax._
 
 trait BooleanSpec[P[_]] extends BooleanPrograms[P]{
 
