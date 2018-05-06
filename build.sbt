@@ -1,3 +1,5 @@
+import xerial.sbt.Sonatype._
+
 lazy val commonSettings = Seq(
   organization := "org.hablapps",
   version := "0.3.2",
@@ -11,17 +13,32 @@ lazy val commonSettings = Seq(
   resolvers ++= Seq(
     "Speech repo - releases" at "http://repo.hablapps.com/releases",
     Resolver.sonatypeRepo("snapshots")),
-  publishTo <<= version { v =>
-    import java.io.File
-    val privateKeyFile: File = new File(sys.env("HOME") + "/.ssh/hablaweb.pem")
-    Some(Resolver.sftp(
-      "HABLA",
-      "repo.hablapps.com",
-      "/var/www/repo/html/" + (
-        if (v.trim.endsWith("SNAPSHOT")) { "snapshots" } else { "releases" }
-      )
-    ) as("ubuntu", privateKeyFile))
-  },
+  publishTo := sonatypePublishTo.value,
+  sonatypeProfileName := "org.hablapps",
+  publishMavenStyle := true,
+  licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+  sonatypeProjectHosting := Some(GitHubHosting("hablapps", "puretest", "juanmanuel.serrano@hablapps.com")),
+  homepage := Some(url("https://github.com/hablapps/puretest")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/hablapps/puretest"),
+      "scm:git@github.com:hablapps/puretest.git"
+    )
+  ),
+  developers := List(
+    Developer(id="jserranohidalgo", 
+      name="Juan Manuel Serrano Hidalgo", 
+      email="juanmanuel.serrano@hablapps.com", 
+      url=url("http://www.hablapps.com")),
+    Developer(id="javierfs89", 
+      name="Javier Fuentes Sánchez", 
+      email="javier.fuentes@hablapps.com", 
+      url=url("http://www.hablapps.com")),
+    Developer(id="jeslg", 
+      name="Jesús López González", 
+      email="jesus.lopez@hablapps.com", 
+      url=url("http://www.hablapps.com"))
+  ),
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -77,3 +94,5 @@ lazy val tictactoe = (project in file("examples/tictactoe"))
       "org.http4s" %% "http4s-circe" % "0.18.0-M5",
       "io.circe" %% "circe-generic" % "0.9.0-M1",
       "io.circe" %% "circe-literal" % "0.9.0-M1"))
+
+
