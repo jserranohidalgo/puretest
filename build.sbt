@@ -10,9 +10,20 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.0",
     "org.scalacheck" %% "scalacheck" % "1.13.4",
     "com.lihaoyi" %% "sourcecode" % "0.1.3"),
-  resolvers ++= Seq(
-    "Speech repo - releases" at "http://repo.hablapps.com/releases",
-    Resolver.sonatypeRepo("snapshots")),
+  scalacOptions ++= Seq(
+    "-unchecked",
+    "-deprecation",
+    "-Ypartial-unification",
+    "-Ywarn-unused-import",
+    // "-Xprint:typer",
+    // "-Xlog-implicit-conversions",
+    "-feature",
+    "-language:implicitConversions",
+    "-language:postfixOps",
+    "-language:higherKinds"),
+  scalacOptions in (Compile, console) ~= (_ filterNot (_ == "-Ywarn-unused-import")),
+  scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value,
+  // Sonatype publishing conf.
   publishTo := sonatypePublishTo.value,
   sonatypeProfileName := "org.hablapps",
   publishMavenStyle := true,
@@ -26,32 +37,19 @@ lazy val commonSettings = Seq(
     )
   ),
   developers := List(
-    Developer(id="jserranohidalgo", 
-      name="Juan Manuel Serrano Hidalgo", 
-      email="juanmanuel.serrano@hablapps.com", 
+    Developer(id="jserranohidalgo",
+      name="Juan Manuel Serrano Hidalgo",
+      email="juanmanuel.serrano@hablapps.com",
       url=url("http://www.hablapps.com")),
-    Developer(id="javierfs89", 
-      name="Javier Fuentes Sánchez", 
-      email="javier.fuentes@hablapps.com", 
+    Developer(id="javierfs89",
+      name="Javier Fuentes Sánchez",
+      email="javier.fuentes@hablapps.com",
       url=url("http://www.hablapps.com")),
-    Developer(id="jeslg", 
-      name="Jesús López González", 
-      email="jesus.lopez@hablapps.com", 
+    Developer(id="jeslg",
+      name="Jesús López González",
+      email="jesus.lopez@hablapps.com",
       url=url("http://www.hablapps.com"))
-  ),
-  scalacOptions ++= Seq(
-    "-unchecked",
-    "-deprecation",
-    "-Ypartial-unification",
-    "-Ywarn-unused-import",
-    // "-Xprint:typer",
-    // "-Xlog-implicit-conversions",
-    "-feature",
-    "-language:implicitConversions",
-    "-language:postfixOps",
-    "-language:higherKinds"),
-  scalacOptions in (Compile, console) ~= (_ filterNot (_ == "-Ywarn-unused-import")),
-  scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value
+  )
 )
 
 
@@ -59,8 +57,8 @@ lazy val root = (project in file("."))
   .aggregate(cats, scalaz, tictactoe)
   .settings(
     commonSettings,
-    publish := { },
-    publishLocal := { })
+    publishArtifact := false
+  )
 
 lazy val cats = project
   .settings(
@@ -84,8 +82,7 @@ lazy val tictactoe = (project in file("examples/tictactoe"))
   .settings(
     commonSettings,
     name := "tictactoe-example",
-    publish := { },
-    publishLocal := { },
+    publishArtifact := false,
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-mtl-core" % "0.1.0" % "test",
       "org.http4s" %% "http4s-dsl" % "0.18.0-M5",
