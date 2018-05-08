@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/hablapps/puretest.svg?branch=master)](https://travis-ci.org/hablapps/puretest)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/hablapps/puretest/master/LICENSE)
 [![Join the chat at https://gitter.im/hablapps/puretest](https://badges.gitter.im/hablapps/puretest.svg)](https://gitter.im/hablapps/puretest?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.hablapps/puretest-cats_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.hablapps/puretest-cats_2.12)
 
 [comment]: # (End Badges)
 
